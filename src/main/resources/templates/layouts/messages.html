@@ -1,0 +1,24 @@
+<div th:fragment="messages" xmlns:th="http://www.thymeleaf.org">
+    <th:block th:if="${success}">
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert" id="flash-success">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </th:block>
+    <th:block th:if="${error}">
+        <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert" id="flash-error">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </th:block>
+    <th:block th:if="${success != null or error != null}">
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var success = document.getElementById('flash-success');
+            var error = document.getElementById('flash-error');
+            if (success) Swal.fire({ icon: 'success', title: '¡Éxito!', text: success.textContent.trim(), timer: 2500, showConfirmButton: false });
+            if (error) Swal.fire({ icon: 'error', title: '¡Error!', text: error.textContent.trim(), timer: 3000, showConfirmButton: false });
+        });
+        </script>
+    </th:block>
+</div>

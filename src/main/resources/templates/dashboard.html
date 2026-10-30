@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHALOM — Beauty Salon Dashboard</title>
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Playfair Display, Parisienne, Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Parisienne&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Reset global SHALOM -->
+    <link href="/css/shalom-reset.css" rel="stylesheet">
+    <!-- Chart.js 4.4 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-glow: #FFF7FA;
+            --white: #FFFFFF;
+            --blush-1: #FFF0F5;
+            --blush-2: #FFE5EE;
+            --blush-3: #FFD0DF;
+            --pink: #F58AAF;
+            --fuchsia: #E94F87;
+            --rose: #C9366C;
+            --text-dark: #3F3540;
+            --text-muted: #6B5B68;
+            --green: #34b37e;
+            --red: #e4696f;
+            --shadow: 0 10px 30px rgba(201, 54, 108, 0.10);
+            --shadow-soft: 0 4px 14px rgba(245, 138, 175, 0.14);
+            --radius: 20px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 8% 6%, rgba(255, 224, 238, 0.55) 0%, transparent 40%),
+                radial-gradient(circle at 95% 12%, rgba(245, 138, 175, 0.25) 0%, transparent 35%),
+                linear-gradient(180deg, #FFF7FA 0%, #FFF0F5 60%, #FFE5EE 100%);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Destellos decorativos sutiles de fondo */
+        body::before, body::after {
+            content: '\f890';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: fixed;
+            color: rgba(233, 79, 135, 0.28);
+            font-size: 1.4rem;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::before { top: 60px; right: 12%; }
+        body::after { content: '\f005'; bottom: 90px; left: 240px; color: rgba(233, 79, 135, 0.22); }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            overflow-x: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 232px;
+            min-width: 232px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            border-right: 1.5px solid var(--blush-3);
+            padding: 22px 14px 16px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            box-shadow: 4px 0 24px rgba(233, 79, 135, 0.10);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background-color: var(--blush-3); border-radius: 4px; }
+
+        .brand-section {
+            text-align: center;
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .brand-flower-top {
+            font-size: 1rem;
+            color: var(--pink);
+            display: inline-block;
+            margin-bottom: 2px;
+            opacity: 0.85;
+        }
+
+        .brand-logo-text {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.9rem;
+            letter-spacing: 3px;
+            margin: 0;
+            line-height: 1.05;
+            background: linear-gradient(130deg, #f18aad 0%, #C9366C 55%, #a51f50 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--rose);
+        }
+
+        .brand-tagline {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.58rem;
+            font-weight: 600;
+            color: var(--pink);
+            letter-spacing: 4px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .brand-cursive-sub {
+            font-family: 'Parisienne', cursive;
+            font-size: 1.5rem;
+            color: var(--rose);
+            margin-top: 6px;
+            display: block;
+            line-height: 1.1;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 14px;
+            border-radius: 50px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.22s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .nav-item-link .icon-label-wrap {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .nav-item-link .icon-label-wrap i {
+            font-size: 0.95rem;
+            width: 20px;
+            text-align: center;
+            color: var(--pink);
+            transition: color 0.2s;
+        }
+
+        .nav-item-link:hover { background-color: var(--blush-1); color: var(--rose); }
+        .nav-item-link:hover .icon-label-wrap i { color: var(--rose); }
+
+        .nav-item-link.active {
+            background: linear-gradient(90deg, var(--fuchsia) 0%, var(--pink) 100%);
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(233, 79, 135, 0.35);
+        }
+        .nav-item-link.active .icon-label-wrap i { color: #ffffff; }
+        .nav-item-link.active .chevron-indicator { color: #ffffff; font-size: 0.7rem; }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 12px;
+            position: relative;
+        }
+
+        .sidebar-flower-img {
+            position: absolute;
+            bottom: -18px;
+            left: -24px;
+            width: 118px;
+            opacity: 0.22;
+            pointer-events: none;
+            z-index: 0;
+            filter: saturate(1.4);
+        }
+
+        .sidebar-cursive-quote {
+            font-family: 'Parisienne', cursive;
+            font-size: 1.55rem;
+            color: var(--rose);
+            line-height: 1.15;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-logout-sidebar {
+            background: transparent;
+            border: 1.5px solid var(--blush-3);
+            border-radius: 50px;
+            color: var(--rose);
+            font-size: 0.77rem;
+            font-weight: 500;
+            padding: 6px 13px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 1;
+            font-family: 'Poppins', sans-serif;
+        }
+        .btn-logout-sidebar:hover { background: var(--blush-2); color: #a51f50; }
+
+        /* ================= MAIN CONTENT ================= */
+        .main-content {
+            margin-left: 232px;
+            flex-grow: 1;
+            padding: 18px 22px 28px 22px;
+            width: calc(100% - 232px);
+            max-width: calc(100% - 232px);
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        /* HEADER BANNER */
+        .header-welcome-card {
+            background: var(--white);
+            border: 1.5px solid var(--blush-3);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft);
+            padding: 18px 22px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-welcome-card::before {
+            content: '\f5bb';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: -12px;
+            left: -6px;
+            font-size: 3.4rem;
+            color: var(--blush-3);
+            opacity: 0.45;
+            pointer-events: none;
+            transform: rotate(-15deg);
+        }
+
+        .greeting-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 2.4vw, 2.3rem);
+            font-weight: 700;
+            color: var(--rose);
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .greeting-title .cursive-name {
+            font-family: 'Parisienne', cursive;
+            font-size: 1.25em;
+            color: var(--fuchsia);
+            vertical-align: baseline;
+        }
+
+        .greeting-heart { color: var(--pink); }
+
+        .greeting-butterfly {
+            font-size: 1.9rem;
+            transform: rotate(-10deg);
+            display: inline-block;
+            margin-left: 6px;
+            filter: drop-shadow(0 3px 6px rgba(233, 79, 135, 0.3));
+        }
+
+        .greeting-subtitle {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            margin: 5px 0 0 0;
+            line-height: 1.4;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .header-capsules {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .capsule-date {
+            background: var(--blush-1);
+            border: 1.5px solid var(--blush-3);
+            border-radius: 50px;
+            padding: 7px 15px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        .capsule-date i { color: var(--rose); font-size: 1rem; }
+        .capsule-date .date-texts small {
+            display: block;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+        .capsule-date .date-texts strong {
+            font-size: 0.78rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .capsule-user {
+            background: var(--blush-1);
+            border: 1.5px solid var(--blush-3);
+            border-radius: 50px;
+            padding: 5px 15px 5px 5px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: inherit;
+            text-decoration: none;
+        }
+        .capsule-user .avatar-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pink) 0%, var(--rose) 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .capsule-user .user-name-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .capsule-user .user-role-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        /* ================= STAT CARDS ================= */
+        .stats-grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .stat-card-custom {
+            background: var(--white);
+            border: 1.5px solid var(--blush-3);
+            border-radius: 16px;
+            box-shadow: var(--shadow-soft);
+            padding: 14px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card-custom::after {
+            content: '\f004';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: -6px;
+            bottom: -8px;
+            font-size: 2.1rem;
+            color: var(--blush-3);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .stat-card-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(233, 79, 135, 0.18);
+        }
+
+        .stat-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .stat-title-label {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            line-height: 1.2;
+            min-height: 2.2em;
+            display: flex;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .stat-icon-circle {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blush-1) 0%, var(--blush-2) 100%);
+            border: 1px solid var(--blush-3);
+            color: var(--rose);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .stat-main-value {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.25rem, 1.7vw, 1.7rem);
+            color: var(--text-dark);
+            margin: 4px 0 4px 0;
+            line-height: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-bottom-trend {
+            font-size: 0.66rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-family: 'Poppins', sans-serif;
+            white-space: nowrap;
+        }
+        .stat-bottom-trend i { font-size: 0.6rem; }
+        .stat-bottom-trend.trend-positive { color: var(--green); }
+        .stat-bottom-trend.trend-negative { color: var(--red); }
+        .stat-symbol-corner { color: var(--pink); flex-shrink: 0; }
+
+        /* ================= CARDS GENERALES ================= */
+        .glass-card {
+            background: var(--white);
+            border: 1.5px solid var(--blush-3);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft);
+            padding: 16px 18px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            position: relative;
+        }
+
+        .glass-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 6px;
+        }
+
+        .glass-card-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            white-space: nowrap;
+        }
+        .glass-card-title i { color: var(--rose); font-size: 1rem; }
+
+        .glass-card-action {
+            font-size: 0.75rem;
+            color: var(--rose);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            transition: color 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+        .glass-card-action:hover { color: #9c154e; }
+
+        /* ================= FILA INTERMEDIA ================= */
+        .middle-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        /* TABLA CITAS DE HOY */
+        .table-citas-today {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+            margin: 0;
+        }
+        .table-citas-today th {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .table-citas-today tr td {
+            background: var(--blush-1);
+            border-top: 1px solid var(--blush-3);
+            border-bottom: 1px solid var(--blush-3);
+            padding: 7px 8px;
+            font-size: 0.78rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .table-citas-today tr td:first-child {
+            border-left: 1px solid var(--blush-3);
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            font-weight: 600;
+            color: var(--rose);
+        }
+        .table-citas-today tr td:last-child {
+            border-right: 1px solid var(--blush-3);
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .avatar-circle-sm {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--blush-3);
+            margin-right: 6px;
+        }
+
+        .badge-pill-status {
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            display: inline-block;
+            font-family: 'Poppins', sans-serif;
+        }
+        .badge-status-confirmed {
+            background-color: #e6f7ef;
+            color: var(--green);
+            border: 1px solid #b7ecd2;
+        }
+        .badge-status-pending {
+            background-color: var(--blush-2);
+            color: var(--rose);
+            border: 1px solid var(--blush-3);
+        }
+        .badge-status-cancelled {
+            background-color: #fde8e8;
+            color: var(--red);
+            border: 1px solid #f5c6c6;
+        }
+
+        .chevron-action-right { color: var(--rose); font-size: 0.76rem; text-decoration: none; }
+
+        /* RESUMEN / GRÁFICO */
+        .sales-chart-container {
+            height: 168px;
+            width: 100%;
+            position: relative;
+        }
+
+        .chart-empty {
+            height: 168px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            background: var(--blush-1);
+            border: 1px dashed var(--blush-3);
+            border-radius: 14px;
+            padding: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .sales-subcards-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .sales-subcard {
+            background: var(--blush-1);
+            border: 1.5px solid var(--blush-3);
+            border-radius: 14px;
+            padding: 9px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .subcard-icon-wrap {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--rose);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        .subcard-info { flex-grow: 1; min-width: 0; }
+        .subcard-title { font-size: 0.68rem; color: var(--text-muted); margin: 0; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .subcard-val {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1rem, 1.2vw, 1.15rem);
+            color: var(--text-dark);
+            margin: 2px 0;
+            line-height: 1.05;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .subcard-note { font-size: 0.62rem; font-weight: 500; color: var(--text-muted); display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+        .subcard-note i { font-size: 0.58rem; color: var(--green); }
+
+        /* ================= FILA INFERIOR: 3 COLUMNAS ================= */
+        .bottom-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+        }
+
+        /* SERVICIOS MÁS SOLICITADOS */
+        .popular-services-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; }
+
+        .popular-service-item { display: flex; align-items: center; gap: 9px; min-width: 0; }
+
+        .service-thumb-sm {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--blush-3);
+            flex-shrink: 0;
+        }
+
+        .service-bar-wrap { flex-grow: 1; min-width: 0; }
+        .service-bar-label { font-size: 0.74rem; font-weight: 600; color: var(--text-dark); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Poppins', sans-serif; }
+
+        .progress-pink-bar { height: 7px; background-color: var(--blush-2); border-radius: 10px; overflow: hidden; }
+        .progress-pink-bar .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pink) 0%, var(--rose) 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .service-count-num { font-size: 0.76rem; font-weight: 700; color: var(--rose); width: 26px; text-align: right; flex-shrink: 0; }
+
+        /* INVENTARIO BAJO */
+        .table-inventario-bajo {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 4px;
+            margin: 0;
+        }
+        .table-inventario-bajo th {
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 2px 6px;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .table-inventario-bajo tr td {
+            background: var(--blush-1);
+            border-top: 1px solid var(--blush-3);
+            border-bottom: 1px solid var(--blush-3);
+            padding: 6px 6px;
+            font-size: 0.75rem;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .table-inventario-bajo tr td:first-child { border-left: 1px solid var(--blush-3); border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        .table-inventario-bajo tr td:last-child { border-right: 1px solid var(--blush-3); border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+
+        .badge-bajo-stock {
+            background-color: #fde8e8;
+            color: var(--red);
+            border: 1px solid #f5c6c6;
+            border-radius: 50px;
+            padding: 2px 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+        }
+        .badge-normal-stock {
+            background-color: #e6f7ef;
+            color: var(--green);
+            border: 1px solid #b7ecd2;
+            border-radius: 50px;
+            padding: 2px 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ACCIONES RÁPIDAS */
+        .actions-quick-title { font-family: 'Parisienne', cursive; font-size: 1.7rem; color: var(--rose); font-weight: 500; }
+
+        .actions-2x2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; flex-grow: 1; }
+
+        .action-card-tile {
+            background: var(--blush-1);
+            border: 1.5px solid var(--blush-3);
+            border-radius: 14px;
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            min-height: 60px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .action-card-tile:hover {
+            transform: translateY(-3px);
+            border-color: var(--pink);
+            background: var(--white);
+            box-shadow: 0 8px 18px rgba(233, 79, 135, 0.2);
+            color: var(--rose);
+        }
+        .action-card-tile i { font-size: 1.3rem; color: var(--rose); margin-bottom: 5px; }
+        .action-card-tile span { font-size: 0.73rem; font-weight: 600; line-height: 1.15; }
+
+        .actions-footer-box { text-align: center; margin-top: 6px; position: relative; padding: 4px 24px 2px 0; }
+        .actions-cursive-quote { font-family: 'Parisienne', cursive; font-size: clamp(1.2rem, 1.4vw, 1.5rem); color: var(--rose); margin: 0; line-height: 1.15; white-space: nowrap; }
+        .actions-butterfly-decor { position: absolute; right: 0px; bottom: -2px; font-size: 1.4rem; transform: rotate(-15deg); filter: drop-shadow(0 2px 4px rgba(233, 79, 135, 0.3)); }
+
+        /* ESTADO VACÍO ELEGANTE */
+        .empty-state-pink {
+            background: var(--blush-1);
+            border: 1px dashed var(--blush-3);
+            border-radius: 14px;
+            padding: 20px 14px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        .empty-state-pink .empty-icon { font-size: 1.3rem; color: var(--rose); display: block; margin-bottom: 6px; }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 1280px) {
+            .stats-grid-container { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 66px; min-width: 66px; padding: 14px 6px; }
+            .sidebar .brand-logo-text, .sidebar .brand-tagline, .sidebar .brand-cursive-sub,
+            .sidebar .sidebar-cursive-quote, .nav-item-link span, .nav-item-link .chevron-indicator,
+            .btn-logout-sidebar span, .brand-flower-top { display: none; }
+            .nav-item-link { justify-content: center; padding: 11px 0; }
+            .nav-item-link .icon-label-wrap { gap: 0; }
+            .main-content { margin-left: 66px; width: calc(100% - 66px); max-width: calc(100% - 66px); padding: 14px 16px; }
+            .middle-row-grid { grid-template-columns: 1fr; }
+            .bottom-row-grid { grid-template-columns: 1fr; }
+            .stats-grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 576px) {
+            .stats-grid-container { grid-template-columns: 1fr; }
+            .sales-subcards-row { grid-template-columns: 1fr; }
+            .header-welcome-card { flex-direction: column; align-items: flex-start; }
+            .header-capsules { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
+    <aside class="sidebar">
+        <div>
+            <!-- LOGO SHALOM -->
+            <div class="brand-section">
+                <span class="brand-flower-top"><i class="fa-solid fa-spa"></i></span>
+                <h1 class="brand-logo-text">SHALOM</h1>
+                <span class="brand-tagline">BEAUTY SALON</span>
+                <span class="brand-cursive-sub">Belleza, orden y mucho amor <i class="fa-solid fa-heart" style="font-size:.55em;"></i></span>
+            </div>
+
+            <!-- NAVEGACIÓN -->
+            <ul class="sidebar-nav">
+                <li>
+                    <a th:href="@{/dashboard}" class="nav-item-link active">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right chevron-indicator"></i>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/appointments}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <span>Citas</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/users}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-user-group"></i>
+                            <span>Clientes</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/services}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-spa"></i>
+                            <span>Servicios</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/specialists}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-hand-sparkles"></i>
+                            <span>Especialistas</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/inventory}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>Inventario</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/cart}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span>Ventas</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/reportes/ingresos}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Reportes</span>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/profile}" class="nav-item-link">
+                        <div class="icon-label-wrap">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Configuración</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- PIE DE LA BARRA LATERAL -->
+        <div class="sidebar-bottom">
+            <img th:src="@{/img/flores1.png}" class="sidebar-flower-img" alt="Decoración floral">
+            <div class="sidebar-cursive-quote">
+                Juntas hacemos<br>que brillen <i class="fa-solid fa-heart" style="font-size:.5em;color:var(--pink);"></i>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn-logout-sidebar">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main class="main-content">
+
+        <!-- HEADER SUPERIOR DE BIENVENIDA -->
+        <section class="header-welcome-card">
+            <div>
+                <h2 class="greeting-title">
+                    ¡Hola, <span class="cursive-name" th:text="${currentUser != null && currentUser.name != null ? currentUser.name : 'Administrador'}">Administrador</span>! <span class="greeting-heart"><i class="fa-solid fa-heart"></i></span>
+                    <span class="greeting-butterfly"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                </h2>
+                <p class="greeting-subtitle">
+                    Aquí tienes un resumen general de tu salón. <br>
+                    Revisa tus citas y mantén todo en orden.
+                </p>
+            </div>
+
+            <!-- Cápsulas superiores de la derecha -->
+            <div class="header-capsules">
+                <div class="capsule-date">
+                    <i class="fa-regular fa-calendar"></i>
+                    <div class="date-texts">
+                        <small>Hoy es</small>
+                        <strong th:text="${fechaHoy != null ? fechaHoy : ''}"></strong>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <a th:href="@{/profile}" class="capsule-user dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar-circle">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="user-name-label"
+                                 th:text="${currentUser != null ? (currentUser.name + (currentUser.lastName != null ? ' ' + currentUser.lastName : '')) : 'Administrador'}">Admin</div>
+                            <div class="user-role-label" th:text="${isAdmin ? 'Administrador' : 'Cliente'}">Administrador</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-muted" style="font-size: 0.7rem; color: var(--pink);"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 16px; border-color: var(--blush-3);">
+                        <li><a class="dropdown-item" th:href="@{/profile}"><i class="fa-solid fa-user-pen me-2" style="color: var(--rose);"></i> Mi Perfil</a></li>
+                        <li><a class="dropdown-item" th:href="@{/fidelizacion}"><i class="fa-solid fa-award me-2" style="color: var(--rose);"></i> Tarjetas Fidelidad</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="px-2">
+                                <button type="submit" class="dropdown-item text-danger border-0 bg-transparent">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i> Salir
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5 TARJETAS DE MÉTRICAS SUPERIORES (DATOS REALES DE LA BD) -->
+        <div class="stats-grid-container">
+            <!-- 1. Citas -->
+            <div class="stat-card-custom">
+                <div class="stat-card-top">
+                    <span class="stat-title-label">Citas totales</span>
+                    <div class="stat-icon-circle"><i class="fa-regular fa-calendar-days"></i></div>
+                </div>
+                <div class="stat-main-value" th:text="${citas != null ? citas : 0}">0</div>
+                <div class="stat-bottom-trend" th:classappend="${trendCitasUp} ? 'trend-positive' : 'trend-negative'">
+                    <span>
+                        <i th:if="${trendCitasUp}" class="fa-solid fa-arrow-up me-1"></i>
+                        <i th:unless="${trendCitasUp}" class="fa-solid fa-arrow-down me-1"></i>
+                        <span th:text="${trendCitas}">Sin cambios</span>
+                    </span>
+                    <span class="stat-symbol-corner"><i class="fa-solid fa-heart"></i></span>
+                </div>
+            </div>
+
+            <!-- 2. Clientes -->
+            <div class="stat-card-custom">
+                <div class="stat-card-top">
+                    <span class="stat-title-label">Clientes registrados</span>
+                    <div class="stat-icon-circle"><i class="fa-solid fa-user-group"></i></div>
+                </div>
+                <div class="stat-main-value" th:text="${usuarios != null ? usuarios : 0}">0</div>
+                <div class="stat-bottom-trend">
+                    <span>Cuentas activas en el salón</span>
+                    <span class="stat-symbol-corner"><i class="fa-solid fa-star"></i></span>
+                </div>
+            </div>
+
+            <!-- 3. Servicios -->
+            <div class="stat-card-custom">
+                <div class="stat-card-top">
+                    <span class="stat-title-label">Servicios</span>
+                    <div class="stat-icon-circle"><i class="fa-regular fa-star"></i></div>
+                </div>
+                <div class="stat-main-value" th:text="${servicios != null ? servicios : 0}">0</div>
+                <div class="stat-bottom-trend">
+                    <span th:text="|${serviciosRealizados != null ? serviciosRealizados : 0} servicios realizados|">0 servicios realizados</span>
+                </div>
+            </div>
+
+            <!-- 4. Inventario -->
+            <div class="stat-card-custom">
+                <div class="stat-card-top">
+                    <span class="stat-title-label">Productos en inventario</span>
+                    <div class="stat-icon-circle"><i class="fa-solid fa-box-open"></i></div>
+                </div>
+                <div class="stat-main-value" th:text="${productos != null ? productos : 0}">0</div>
+                <div class="stat-bottom-trend" th:if="${productosBajoStock != null && !#lists.isEmpty(productosBajoStock)}">
+                    <span th:text="|${#lists.size(productosBajoStock)} con stock bajo|">0 con stock bajo</span>
+                    <span class="stat-symbol-corner"><i class="fa-solid fa-heart"></i></span>
+                </div>
+                <div class="stat-bottom-trend" th:if="${productosBajoStock == null || #lists.isEmpty(productosBajoStock)}">
+                    <span>Inventario saludable</span>
+                </div>
+            </div>
+
+            <!-- 5. Ingresos estimados -->
+            <div class="stat-card-custom">
+                <div class="stat-card-top">
+                    <span class="stat-title-label">Ingresos estimados</span>
+                    <div class="stat-icon-circle"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
+                </div>
+                <div class="stat-main-value" th:text="${totalVentas != null ? totalVentas : '$0'}">$0</div>
+                <div class="stat-bottom-trend">
+                    <span th:text="|Ticket promedio: ${ticketPromedio != null ? ticketPromedio : '$0'}|">Ticket promedio: $0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA INTERMEDIA: CITAS DE HOY & RESUMEN -->
+        <div class="middle-row-grid">
+            <!-- Citas de hoy (Tabla dinámica de la BD) -->
+            <div class="glass-card">
+                <div class="glass-card-header">
+                    <h3 class="glass-card-title">
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <span>Citas de hoy</span>
+                    </h3>
+                    <a th:href="@{/appointments}" class="glass-card-action">
+                        Ver todas <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                    <span class="badge-pill-status badge-status-confirmed"><i class="fa-solid fa-circle me-1" style="font-size:0.4rem;"></i> <span th:text="${citasHoyConfirmadas ?: 0}">0</span> confirmadas</span>
+                    <span class="badge-pill-status badge-status-pending"><i class="fa-solid fa-circle me-1" style="font-size:0.4rem;"></i> <span th:text="${citasHoyPendientes ?: 0}">0</span> pendientes</span>
+                    <span class="badge-pill-status badge-status-cancelled" th:if="${citasHoyCanceladas != null && citasHoyCanceladas > 0}"><i class="fa-solid fa-circle me-1" style="font-size:0.4rem;"></i> <span th:text="${citasHoyCanceladas}">0</span> canceladas</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table-citas-today" th:if="${not #lists.isEmpty(ultimasCitas)}">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Cliente</th>
+                                <th>Servicio</th>
+                                <th>Especialista</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="cita : ${ultimasCitas}">
+                                <td th:text="${cita.time != null ? #temporals.format(cita.time, 'hh:mm a') : '—'}">—</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img th:src="@{/img/avatar.jpg}" class="avatar-circle-sm" alt="Cliente">
+                                        <span class="fw-semibold" th:text="${cita.user != null ? cita.user.name + ' ' + (cita.user.lastName != null ? cita.user.lastName : '') : 'Cliente'}">Cliente</span>
+                                    </div>
+                                </td>
+                                <td th:text="${cita.service != null ? cita.service.name : '—'}">—</td>
+                                <td th:text="${cita.worker != null ? cita.worker : '—'}">—</td>
+                                <td>
+                                    <th:block th:switch="${cita.status != null ? cita.status.toLowerCase() : ''}">
+                                        <span th:case="'confirmada'" class="badge-pill-status badge-status-confirmed">Confirmada</span>
+                                        <span th:case="'completada'" class="badge-pill-status badge-status-confirmed">Completada</span>
+                                        <span th:case="'cancelada'" class="badge-pill-status badge-status-cancelled">Cancelada</span>
+                                        <span th:case="*" class="badge-pill-status badge-status-pending">Pendiente</span>
+                                    </th:block>
+                                </td>
+                                <td><a th:href="@{/appointments}" class="chevron-action-right"><i class="fa-solid fa-chevron-right"></i></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="empty-state-pink" th:if="${#lists.isEmpty(ultimasCitas)}">
+                        <span class="empty-icon"><i class="fa-regular fa-calendar-xmark"></i></span>
+                        No hay citas registradas para hoy aún.
+                        <a th:href="@{/appointments/create}" class="btn btn-sm ms-2" style="background: var(--rose); color: white; border-radius: 50px; font-size: 0.72rem;">+ Nueva Cita</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen (Gráfico con datos reales) -->
+            <div class="glass-card">
+                <div class="glass-card-header">
+                    <h3 class="glass-card-title">
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>Resumen — Citas por día</span>
+                    </h3>
+                    <span class="badge bg-white text-muted border px-2 py-1" style="font-size: 0.72rem; border-color: var(--blush-3) !important;">
+                        Últimos 8 días
+                    </span>
+                </div>
+
+                <!-- Gráfico si hay datos, si no estado vacío elegante -->
+                <div class="sales-chart-container" th:if="${not #lists.isEmpty(chartCounts)}">
+                    <canvas id="chartSummary"></canvas>
+                </div>
+
+                <div class="chart-empty" th:if="${#lists.isEmpty(chartCounts)}">
+                    <span class="empty-icon" style="font-size:1.4rem; color: var(--rose);"><i class="fa-solid fa-chart-simple"></i></span>
+                    Aún no hay suficientes datos para generar este resumen.
+                </div>
+
+                <!-- 2 Subtarjetas inferiores -->
+                <div class="sales-subcards-row">
+                    <!-- Ingresos estimados -->
+                    <div class="sales-subcard">
+                        <div class="subcard-icon-wrap">
+                            <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                        </div>
+                        <div class="subcard-info">
+                            <p class="subcard-title">Ingresos estimados</p>
+                            <div class="subcard-val" th:text="${totalVentas != null ? totalVentas : '$0'}">$0</div>
+                            <div class="subcard-note">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>Basado en citas confirmadas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ticket promedio -->
+                    <div class="sales-subcard">
+                        <div class="subcard-icon-wrap">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <div class="subcard-info">
+                            <p class="subcard-title">Ticket promedio</p>
+                            <div class="subcard-val" th:text="${ticketPromedio != null ? ticketPromedio : '$0'}">$0</div>
+                            <div class="subcard-note">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>Por cita realizada</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA INFERIOR: SERVICIOS MÁS SOLICITADOS, INVENTARIO BAJO & ACCIONES RÁPIDAS -->
+        <div class="bottom-row-grid">
+            <!-- 1. Servicios más solicitados (Dinámico de la BD) -->
+            <div class="glass-card">
+                <div class="glass-card-header">
+                    <h3 class="glass-card-title">
+                        <i class="fa-solid fa-spa"></i>
+                        <span>Servicios más solicitados</span>
+                    </h3>
+                    <a th:href="@{/reportes/servicios}" class="glass-card-action">
+                        Ver todos <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="popular-services-list" th:if="${not #lists.isEmpty(serviciosPopulares)}">
+                    <div class="popular-service-item" th:each="item : ${serviciosPopulares}">
+                        <span class="service-thumb-sm d-flex align-items-center justify-content-center" style="background: var(--blush-2); color: var(--rose); font-size: 0.85rem;">
+                            <i class="fa-solid fa-spa"></i>
+                        </span>
+                        <div class="service-bar-wrap">
+                            <div class="service-bar-label" th:text="${item.service.name}">Servicio</div>
+                            <div class="progress-pink-bar">
+                                <div class="progress-fill" th:style="'width: ' + ${item.percentage} + '%;'"></div>
+                            </div>
+                        </div>
+                        <span class="service-count-num" th:text="${item.count}">0</span>
+                    </div>
+                </div>
+
+                <div class="empty-state-pink" th:if="${#lists.isEmpty(serviciosPopulares)}">
+                    <span class="empty-icon"><i class="fa-solid fa-spa"></i></span>
+                    Aún no hay citas registradas para calcular los servicios más solicitados.
+                </div>
+            </div>
+
+            <!-- 2. Inventario bajo (Dinámico de la BD) -->
+            <div class="glass-card">
+                <div class="glass-card-header">
+                    <h3 class="glass-card-title">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: var(--red);"></i>
+                        <span>Inventario bajo</span>
+                    </h3>
+                    <a th:href="@{/inventory}" class="glass-card-action">
+                        Ver todos <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table-inventario-bajo" th:if="${not #lists.isEmpty(productosBajoStock)}">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Stock</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="prod : ${productosBajoStock}">
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img th:src="${prod.image != null ? prod.image : '/img/esmalte.jpg'}" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;" onerror="this.src='/img/esmalte.jpg'" alt="Producto">
+                                        <span class="fw-semibold text-truncate" style="max-width: 120px;" th:text="${prod.productName}">Producto</span>
+                                    </div>
+                                </td>
+                                <td class="text-center fw-bold" th:text="${prod.stock}">0</td>
+                                <td>
+                                    <span class="badge-bajo-stock" th:if="${prod.stock <= 5}">Bajo</span>
+                                    <span class="badge-normal-stock" th:if="${prod.stock > 5}">Normal</span>
+                                </td>
+                                <td><a th:href="@{/inventory}" class="chevron-action-right"><i class="fa-solid fa-chevron-right"></i></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="empty-state-pink" th:if="${#lists.isEmpty(productosBajoStock)}">
+                        <span class="empty-icon"><i class="fa-solid fa-boxes-stacked"></i></span>
+                        No hay productos en inventario bajo.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Acciones r
+            <div class="glass-card">
+                <div class="glass-card-header">
+                    <h3 class="glass-card-title actions-quick-title">
+                        Acciones rápidas <i class="fa-solid fa-heart" style="font-size:.55em;color:var(--pink);"></i>
+                    </h3>
+                    <span style="font-size: 1.1rem; color: var(--pink);"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                </div>
+
+                <!-- Grid 2x2 de botones -->
+                <div class="actions-2x2-grid">
+                    <a th:href="@{/appointments/create}" class="action-card-tile">
+                        <i class="fa-regular fa-calendar-plus"></i>
+                        <span>Crear cita</span>
+                    </a>
+                    <a th:href="@{/users/create}" class="action-card-tile">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Registrar cliente</span>
+                    </a>
+                    <a th:href="@{/inventory/create}" class="action-card-tile">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Agregar producto</span>
+                    </a>
+                    <a th:href="@{/reportes/ingresos}" class="action-card-tile">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Ver reportes</span>
+                    </a>
+                </div>
+
+                <!-- Pie con frase en cursiva y mariposa -->
+                <div class="actions-footer-box">
+                    <div class="actions-cursive-quote">
+                        Tu sal
+                    </div>
+                    <span class="actions-butterfly-decor"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Renderizado del Gráfico de Resumen con Chart.js (datos reales) -->
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const canvas = document.getElementById('chartSummary');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        const labels = /*[[${chartLabels}]]*/ [];
+        const counts = /*[[${chartCounts}]]*/ [];
+        if (!Array.isArray(counts) || counts.length === 0 || counts.reduce((a, b) => a + b, 0) === 0) {
+            canvas.closest('.sales-chart-container').style.display = 'none';
+            return;
+        }
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 170);
+        gradient.addColorStop(0, 'rgba(233, 79, 135, 0.35)');
+        gradient.addColorStop(0.7, 'rgba(245, 138, 175, 0.12)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Citas',
+                    data: counts,
+                    borderColor: '#E94F87',
+                    borderWidth: 2.6,
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.42,
+                    pointBackgroundColor: '#E94F87',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4.5,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#ffffff',
+                        titleColor: '#3F3540',
+                        bodyColor: '#E94F87',
+                        borderColor: '#FFD0DF',
+                        borderWidth: 1.5,
+                        padding: 8,
+                        boxPadding: 4,
+                        callbacks: {
+                            label: function (context) {
+                                return ' ' + context.parsed.y + ' cita(s)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 208, 223, 0.4)' },
+                        ticks: { color: '#6B5B68', font: { family: 'Poppins', size: 10 } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#6B5B68', font: { family: 'Poppins', size: 10 }, stepSize: 1 },
+                        grid: { color: 'rgba(255, 208, 223, 0.4)', drawBorder: false }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

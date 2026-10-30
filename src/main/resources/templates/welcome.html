@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHALOM Beauty Salon</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Parisienne&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="/css/shalom-reset.css" rel="stylesheet">
+<style>
+:root{
+    --bg-main:#FFF7FA;
+    --bg-sec:#FFF0F5;
+    --pink-pastel:#FFE5EE;
+    --pink-light:#FFD0DF;
+    --pink:#F58AAF;
+    --fuchsia:#E94F87;
+    --pink-dark:#C9366C;
+    --white:#FFFFFF;
+    --text-sec:#6B5B68;
+    --text-main:#3F3540;
+    --line:#F3D9E3;
+    --shadow:0 18px 40px rgba(201,54,108,.12);
+    --shadow-soft:0 10px 28px rgba(201,54,108,.08);
+    --radius:22px;
+    --radius-sm:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg-main);color:var(--text-main);font-family:'Poppins',sans-serif;overflow-x:hidden;font-size:15px}
+a{transition:.25s ease;text-decoration:none}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;color:var(--pink-dark)}
+img{max-width:100%}
+.text-pink{color:var(--pink)}
+
+/* ==================== DECORATIVE GLOW ==================== */
+.sparkle{position:absolute;color:var(--pink);opacity:.7;z-index:2;pointer-events:none;animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(8deg)}}
+.deco-flower{position:absolute;opacity:.55;z-index:1;pointer-events:none;animation:float 8s ease-in-out infinite}
+.deco-heart{position:absolute;color:var(--pink-light);opacity:.7;z-index:2;pointer-events:none;animation:float 7s ease-in-out infinite}
+
+/* ==================== NAVBAR ==================== */
+.navbar{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);box-shadow:0 4px 24px rgba(201,54,108,.08);border-radius:0 0 30px 30px}
+.navbar-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 24px}
+.brand{display:flex;flex-direction:column;line-height:1;color:var(--fuchsia);text-decoration:none}
+.brand .brand-name{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;letter-spacing:.14em;color:var(--fuchsia)}
+.brand .brand-sub{font-family:'Parisienne',cursive;font-size:1.05rem;color:var(--pink);letter-spacing:.02em;margin-top:2px}
+.nav-tools{display:flex;align-items:center;gap:14px}
+.nav-icon{width:40px;height:40px;border-radius:50%;background:var(--bg-sec);display:inline-flex;align-items:center;justify-content:center;color:var(--pink-dark);font-size:1.05rem;position:relative;border:none}
+.nav-icon:hover{background:var(--pink-pastel)}
+.nav-icon .badge{position:absolute;top:-2px;right:-2px;background:var(--fuchsia);color:#fff;border-radius:50%;font-size:.6rem;width:17px;height:17px;display:flex;align-items:center;justify-content:center}
+.nav-avatar{display:flex;align-items:center;gap:10px;border:none;background:var(--bg-sec);border-radius:999px;padding:5px 14px 5px 5px;color:var(--text-main);font-weight:500;font-size:.85rem}
+.nav-avatar:hover{background:var(--pink-pastel)}
+.nav-avatar img,.nav-avatar .avatar-fallback{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.nav-avatar .avatar-fallback{background:linear-gradient(135deg,var(--fuchsia),var(--pink));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.8rem}
+.nav-avatar .chev{color:var(--text-sec);font-size:.75rem}
+.nav-cta{background:linear-gradient(135deg,var(--fuchsia),#E94F87);border:none;color:#fff;border-radius:999px;padding:11px 24px;font-weight:600;font-size:.86rem;display:inline-flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(233,79,135,.35);transition:.3s}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(233,79,135,.45);color:#fff}
+.navbar-toggler{border:none;color:var(--pink-dark);font-size:1.5rem;background:var(--bg-sec);border-radius:12px}
+.navbar-toggler:focus{box-shadow:none}
+
+/* ==================== HERO ==================== */
+.hero{position:relative;background:linear-gradient(120deg,var(--bg-main) 0%,var(--bg-sec) 55%,var(--pink-pastel) 100%);padding:90px 0 90px;overflow:hidden}
+.hero:before{content:'';position:absolute;right:-160px;top:-160px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(245,138,175,.18),transparent 65%)}
+.hero:after{content:'';position:absolute;left:-120px;bottom:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(233,79,135,.10),transparent 65%)}
+.hero .deco-flower.f1{top:60px;right:8%;font-size:2.6rem}
+.hero .deco-flower.f2{bottom:40px;left:4%;font-size:2.2rem}
+.hero .sparkle.s1{top:90px;left:46%;font-size:1.2rem}
+.hero .sparkle.s2{bottom:80px;right:42%;font-size:1.4rem}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);color:var(--pink-dark);font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:9px 22px;border-radius:999px;box-shadow:var(--shadow-soft)}
+.hero-script{font-family:'Parisienne',cursive;font-size:clamp(2.2rem,4vw,3.2rem);color:var(--pink);margin:20px 0 4px}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(3.6rem,8vw,6.5rem);font-weight:700;letter-spacing:.03em;line-height:1;color:var(--pink-dark);margin:0}
+.hero h1 .accent{color:var(--fuchsia)}
+.hero-welcome{font-family:'Parisienne',cursive;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--fuchsia);margin:14px 0 6px;opacity:.9}
+.hero-text{color:var(--text-sec);font-size:1rem;line-height:1.9;max-width:480px;margin-top:12px;font-weight:300}
+.hero-buttons{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
+.btn{font-family:'Poppins',sans-serif;border-radius:999px;font-weight:600;font-size:.9rem;padding:14px 30px;display:inline-flex;align-items:center;gap:9px;transition:.3s;border:none}
+.btn-primary-hero{background:linear-gradient(135deg,var(--fuchsia),#E94F87);color:#fff;box-shadow:0 8px 22px rgba(233,79,135,.4)}
+.btn-primary-hero:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(233,79,135,.5);color:#fff}
+.btn-outline-hero{background:#fff;color:var(--pink-dark);border:1.5px solid var(--pink);box-shadow:var(--shadow-soft)}
+.btn-outline-hero:hover{background:var(--bg-sec);border-color:var(--fuchsia);color:var(--fuchsia);transform:translateY(-3px)}
+.hero-art{position:relative;max-width:480px;margin:0 auto}
+.hero-img-wrap{position:relative;border-radius:50% 50% 34px 34px;overflow:hidden;border:8px solid #fff;box-shadow:0 24px 60px rgba(201,54,108,.22)}
+.hero-img-wrap img{width:100%;height:480px;object-fit:cover;display:block}
+.hero-img-wrap:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(233,79,135,.12),transparent 40%)}
+.hero-art .badge-float{position:absolute;background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:12px 18px;display:flex;align-items:center;gap:10px;z-index:3;animation:float 6s ease-in-out infinite}
+.badge-float .bi-emoji-heart-eyes{font-size:1.4rem;color:var(--fuchsia)}
+.badge-float small{display:block;color:var(--text-sec);font-size:.68rem;line-height:1.2}
+.badge-float strong{color:var(--pink-dark);font-size:.8rem;display:block;font-weight:600}
+.badge-top{top:40px;right:-18px}
+.badge-bottom{bottom:40px;left:-22px}
+.hero-art .ring{position:absolute;border:1.5px dashed var(--pink-light);border-radius:50%;z-index:1}
+.ring.r1{width:120px;height:120px;top:-20px;left:-20px;animation:spin 40s linear infinite}
+.ring.r2{width:80px;height:80px;bottom:-10px;right:-10px;animation:spin 30s linear infinite reverse}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ==================== BENEFITS STRIP ==================== */
+.benefits{background:#fff;box-shadow:0 -4px 30px rgba(201,54,108,.05);position:relative;z-index:2}
+.benefits .row{align-items:stretch}
+.benefit{display:flex;align-items:center;gap:16px;padding:26px 20px;position:relative}
+.benefit:not(:last-child):after{content:'';position:absolute;right:0;top:25%;height:50%;width:1px;background:var(--line)}
+.benefit-icon{width:56px;height:56px;min-width:56px;border-radius:50%;background:linear-gradient(135deg,var(--pink-pastel),var(--pink-light));display:flex;align-items:center;justify-content:center;color:var(--fuchsia);font-size:1.4rem;box-shadow:var(--shadow-soft)}
+.benefit strong{color:var(--text-main);font-size:.88rem;font-weight:600;display:block;line-height:1.3}
+.benefit span{color:var(--text-sec);font-size:.76rem;display:block;margin-top:3px;font-weight:300}
+
+/* ==================== SECTIONS ==================== */
+.section{padding:90px 0;position:relative}
+.section-alt{background:var(--bg-sec)}
+.heading{text-align:center;margin-bottom:56px}
+.heading .script{font-family:'Parisienne',cursive;font-size:1.9rem;color:var(--pink);display:block;margin-bottom:4px}
+.heading h2{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,4.5vw,3.4rem);font-weight:600;margin:8px 0 12px;color:var(--pink-dark)}
+.heading p{color:var(--text-sec);font-size:.95rem;max-width:560px;margin:auto;font-weight:300}
+.heading-divider{display:inline-flex;align-items:center;gap:10px;margin-top:8px}
+.heading-divider:before,.heading-divider:after{content:'';width:44px;height:1px;background:var(--pink-light)}
+.heading-divider i{color:var(--fuchsia);font-size:.9rem}
+
+/* ==================== SERVICE CARDS ==================== */
+.service-card{background:#fff;border:1px solid var(--pink-pastel);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-soft);height:100%;transition:.35s;position:relative}
+.service-card:hover{transform:translateY(-10px);box-shadow:var(--shadow);border-color:var(--pink-light)}
+.service-photo{height:185px;overflow:hidden;position:relative}
+.service-photo img{width:100%;height:100%;object-fit:cover;transition:.5s ease}
+.service-card:hover .service-photo img{transform:scale(1.08)}
+.service-icon{position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--fuchsia),var(--pink));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.25rem;border:4px solid #fff;box-shadow:0 6px 16px rgba(233,79,135,.3);z-index:2}
+.service-body{padding:38px 20px 22px;text-align:center}
+.service-body h3{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:600;margin-bottom:8px}
+.service-body p{color:var(--text-sec);font-size:.8rem;line-height:1.7;font-weight:300;margin-bottom:14px}
+.service-more{color:var(--fuchsia);font-size:.78rem;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.service-more:hover{color:var(--pink-dark);gap:10px}
+.btn-center{text-align:center;margin-top:44px}
+
+/* ==================== PROMOTION BANNER ==================== */
+.promo-section{background:linear-gradient(135deg,var(--bg-sec),var(--pink-pastel));position:relative;overflow:hidden}
+.promo-section .deco-heart.h1{top:30px;right:6%;font-size:1.6rem}
+.promo-section .deco-heart.h2{bottom:40px;left:6%;font-size:1.9rem}
+.promo-section .deco-flower.f3{top:20px;left:14%;font-size:2.2rem}
+.promotion-panel{position:relative;background:linear-gradient(120deg,var(--pink-light) 0%,var(--pink-pastel) 60%,#fff 100%);border-radius:30px;overflow:hidden;box-shadow:var(--shadow);padding:56px}
+.promotion-panel:before{content:'';position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;border:2px dashed rgba(201,54,108,.2)}
+.promotion-panel .promo-img{position:absolute;right:0;top:0;height:100%;width:44%;object-fit:cover;opacity:.9;border-radius:30px 30px 0 0;mask-image:linear-gradient(90deg,transparent,#000 15%)}
+.promotion-copy{position:relative;z-index:2;max-width:56%}
+.promotion-copy .promo-script{font-family:'Parisienne',cursive;font-size:clamp(2rem,3.5vw,2.8rem);color:var(--fuchsia);margin-bottom:6px}
+.promotion-copy h2{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3.2rem);font-weight:700;color:var(--pink-dark);line-height:1.05;margin-bottom:10px}
+.promotion-copy .promo-sub{color:var(--text-sec);font-size:.92rem;font-weight:300;margin-bottom:26px}
+.promo-badge{display:inline-block;background:#fff;color:var(--fuchsia);font-size:.8rem;font-weight:600;padding:8px 20px;border-radius:999px;box-shadow:var(--shadow-soft);margin-bottom:16px}
+.promo-bow{position:absolute;bottom:24px;right:46px;font-size:2.6rem;color:var(--fuchsia);opacity:.85;transform:rotate(-12deg);z-index:2;animation:float 6s ease-in-out infinite}
+
+/* ==================== ABOUT ==================== */
+.about .about-copy .script{font-family:'Parisienne',cursive;font-size:1.9rem;color:var(--pink)}
+.about h2{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3rem);font-weight:600;color:var(--pink-dark);margin:10px 0 18px}
+.about p{color:var(--text-sec);font-size:.92rem;line-height:1.9;font-weight:300}
+.about-points{list-style:none;padding:0;margin:24px 0}
+.about-points li{display:flex;align-items:center;gap:12px;margin-bottom:12px;color:var(--text-main);font-size:.9rem;font-weight:500}
+.about-points li i{color:var(--fuchsia);font-size:1.1rem}
+.about-img-wrap{position:relative;border-radius:28px;overflow:hidden;border:8px solid #fff;box-shadow:var(--shadow)}
+.about-img-wrap img{width:100%;height:440px;object-fit:cover;display:block}
+.about-img-wrap:after{content:'';position:absolute;inset:0;border-radius:22px;border:1.5px solid var(--pink-light);margin:10px;pointer-events:none}
+.about-imglabel{position:absolute;bottom:20px;left:20px;background:rgba(255,255,255,.94);padding:12px 20px;border-radius:16px;box-shadow:var(--shadow-soft);font-family:'Parisienne',cursive;font-size:1.2rem;color:var(--fuchsia);z-index:3}
+.about-imglabel span{display:block;font-family:'Poppins',sans-serif;font-size:.7rem;color:var(--text-sec);font-weight:400}
+.about .deco-flower.f4{top:-22px;right:-16px;font-size:2.6rem}
+
+/* ==================== GALLERY ==================== */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.gallery-item{position:relative;border-radius:18px;overflow:hidden;border:3px solid #fff;box-shadow:var(--shadow-soft);cursor:pointer}
+.gallery-item img{width:100%;height:220px;object-fit:cover;transition:.45s ease;display:block}
+.gallery-item:hover img{transform:scale(1.1)}
+.gallery-item:hover{border-color:var(--pink-light)}
+.gallery-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(233,79,135,.35),transparent);opacity:0;transition:.4s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:18px}
+.gallery-item:hover .gallery-overlay{opacity:1}
+.gallery-overlay span{color:#fff;font-size:.82rem;font-weight:600;background:rgba(0,0,0,.25);padding:6px 16px;border-radius:999px;backdrop-filter:blur(4px)}
+
+/* ==================== LOYALTY ==================== */
+.loyalty-section{background:linear-gradient(135deg,#fff,var(--bg-sec));border-radius:30px;box-shadow:var(--shadow);padding:48px;margin-top:20px}
+.loyalty-section h2{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,3.5vw,2.6rem);font-weight:600;color:var(--pink-dark)}
+.loyalty-section p{color:var(--text-sec);font-size:.9rem;line-height:1.8;font-weight:300}
+.loyalty-badge{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--fuchsia),var(--pink));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 8px 20px rgba(233,79,135,.4);margin-bottom:14px}
+.loyalty-card-scene{cursor:pointer;margin:auto;max-width:650px;perspective:1300px}
+.loyalty-card{aspect-ratio:1.9/1;position:relative;transform-style:preserve-3d;transition:transform .8s;width:100%}
+.loyalty-card-scene:hover .loyalty-card,.loyalty-card.is-flipped{transform:rotateY(180deg)}
+.loyalty-card-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;background-position:center;background-repeat:no-repeat;background-size:cover;border:5px solid #fff;border-radius:20px;box-shadow:0 16px 34px rgba(99,59,81,.22);inset:0;position:absolute}
+.loyalty-card-front{background-image:url('/img/Tarjeta%20Frente.png')}
+.loyalty-card-back{background-image:url('/img/Tarjeta%20Respaldo.png');transform:rotateY(180deg)}
+.loyalty-card-face span{background:rgba(255,255,255,.9);border-radius:999px;bottom:10px;color:var(--pink-dark);font-size:.68rem;font-weight:600;left:50%;padding:5px 12px;position:absolute;transform:translateX(-50%)}
+.loyalty-flip-toggle{background:#fff;border:1.5px solid var(--pink);border-radius:999px;color:var(--pink-dark);font-size:.8rem;font-weight:600;padding:11px 20px;transition:.3s;display:inline-flex;align-items:center;gap:8px}
+.loyalty-flip-toggle:hover{background:var(--bg-sec);border-color:var(--fuchsia);color:var(--fuchsia)}
+
+/* ==================== CONTACT ==================== */
+.contact{background:#fff}
+.contact-card{background:var(--bg-main);border:1px solid var(--line);border-radius:var(--radius);padding:34px;height:100%;box-shadow:var(--shadow-soft)}
+.contact-card h3{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:600;margin-bottom:24px;color:var(--pink-dark)}
+.form-control{background:#fff;border:1.5px solid var(--line);border-radius:14px;font-size:.86rem;padding:12px 16px;color:var(--text-main);transition:.3s}
+.form-control:focus{border-color:var(--pink);box-shadow:0 0 0 .22rem rgba(245,138,175,.16);background:#fff}
+.contact-item{display:flex;gap:14px;margin-bottom:20px;align-items:flex-start}
+.contact-item .ci-icon{width:44px;height:44px;min-width:44px;border-radius:50%;background:var(--pink-pastel);color:var(--fuchsia);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.contact-item h5{color:var(--text-main);font-size:.8rem;font-weight:600;margin:0 0 2px;font-family:'Poppins',sans-serif}
+.contact-item p{color:var(--text-sec);font-size:.78rem;margin:0;font-weight:300}
+
+/* ==================== FOOTER ==================== */
+.footer{background:linear-gradient(135deg,var(--pink-dark),#a82856);color:rgba(255,255,255,.9);padding:56px 0 24px;position:relative;overflow:hidden}
+.footer:before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%)}
+.footer .brand-name{color:#fff;font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:.14em;display:block;margin-bottom:4px}
+.footer .brand-sub{font-family:'Parisienne',cursive;font-size:1.2rem;color:var(--pink-light)}
+.footer p,.footer a{color:rgba(255,255,255,.82);font-size:.82rem}
+.footer a{text-decoration:none;font-weight:300}
+.footer a:hover{color:#fff;padding-left:4px}
+.footer-title{font-size:.78rem;font-weight:700;letter-spacing:.12em;margin-bottom:16px;text-transform:uppercase;color:#fff}
+.social{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);color:#fff!important;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;transition:.3s;font-size:1rem}
+.social:hover{background:#fff;color:var(--pink-dark)!important;transform:translateY(-3px)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.22);margin-top:34px;padding-top:18px}
+.footer .deco-flower.f6{top:30px;right:4%;font-size:2rem;color:var(--pink-light)}
+
+/* ==================== ANIMATIONS ==================== */
+.fade-up{opacity:0;transform:translateY(40px);transition:opacity .9s ease,transform .9s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+.fade-in{opacity:0;transition:opacity 1s ease}
+.fade-in.visible{opacity:1}
+
+/* ==================== RESPONSIVE ==================== */
+@media(max-width:991px){
+  .hero{text-align:center;padding:60px 0}
+  .hero-text{margin:12px auto 0}
+  .hero-buttons{justify-content:center}
+  .hero-art{margin-top:44px}
+  .hero-img-wrap img{height:380px}
+  .benefit:not(:last-child):after{display:none}
+  .promotion-panel{padding:40px 28px}
+  .promotion-copy{max-width:100%}
+  .promotion-panel .promo-img{opacity:.25}
+}
+@media(max-width:767px){
+  .section{padding:64px 0}
+  .hero-img-wrap img{height:320px}
+  .badge-top{right:0}
+  .badge-bottom{left:0}
+  .navbar-inner{padding:12px 16px}
+  .promotion-panel{padding:36px 24px}
+  .promotion-copy{max-width:100%}
+  .promo-badge{font-size:.72rem}
+  .loyalty-section{padding:32px 20px}
+  .about-img-wrap img{height:340px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+  .loyalty-card-scene:hover .loyalty-card{transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar navbar-expand-xl">
+  <div class="container navbar-inner">
+    <a class="brand" th:href="@{/}">
+      <span class="brand-name">SHALOM</span>
+      <span class="brand-sub">Beauty Salon</span>
+    </a>
+    <button class="navbar-toggler d-xl-none ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#homeMenu" aria-label="Abrir menú"><i class="bi bi-list fs-2"></i></button>
+    <div class="collapse navbar-collapse t-nav-links" id="homeMenu">
+      <ul class="navbar-nav flex-column flex-xl-row flex-wrap align-items-xl-center">
+        <li class="nav-item"><a class="t-nav-link active" href="#inicio"><i class="bi bi-house-heart-fill"></i> Inicio</a></li>
+        <li class="nav-item"><a class="t-nav-link" href="#servicios"><i class="bi bi-stars"></i> Servicios</a></li>
+        <li class="nav-item"><a class="t-nav-link" href="#nosotros"><i class="bi bi-person-hearts"></i> Especialistas</a></li>
+        <li class="nav-item"><a class="t-nav-link" href="#fidelidad"><i class="bi bi-calendar-heart"></i> Citas</a></li>
+        <li class="nav-item"><a class="t-nav-link" href="#galeria"><i class="bi bi-bag-heart"></i> Tienda</a></li>
+        <li class="nav-item"><a class="t-nav-link" href="#contacto"><i class="bi bi-envelope-heart"></i> Contacto</a></li>
+      </ul>
+    </div>
+    <div class="nav-tools">
+      <a class="nav-icon t-nav-icon" href="#servicios" aria-label="Buscar"><i class="bi bi-search"></i></a>
+      <div class="position-relative t-bell">
+        <button class="nav-icon" type="button" aria-label="Notificaciones"><i class="bi bi-bell"></i><span class="badge">3</span></button>
+      </div>
+      <div th:if="${#authorization.expression('isAuthenticated()')}">
+        <button class="nav-avatar" type="button">
+          <span class="avatar-fallback" th:text="${#strings.substring(#authentication.name,0,1)?: 'U'}">U</span>
+          <span class="d-none d-md-inline" th:text="${#authentication.name}">usuario</span>
+          <i class="bi bi-chevron-down chev"></i>
+        </button>
+      </div>
+      <a class="nav-cta d-none d-sm-inline-flex" sec:authorize="isAuthenticated()" th:href="@{/appointments/create}"><i class="bi bi-calendar-heart"></i> Reservar cita</a>
+      <a class="nav-cta d-none d-sm-inline-flex" sec:authorize="!isAuthenticated()" th:href="@{/login}"><i class="bi bi-calendar-heart"></i> Reservar cita</a>
+    </div>
+  </div>
+</nav>
+<style>
+.t-nav-links .navbar-nav{gap:6px}
+.t-nav-links .navbar-nav .nav-item{margin:0}
+.t-nav-link{color:var(--text-sec)!important;font-size:.86rem;font-weight:500;padding:9px 16px;border-radius:999px;display:flex;align-items:center;gap:7px;white-space:nowrap;text-decoration:none}
+.t-nav-link i{font-size:.95rem;color:var(--pink)}
+.t-nav-link:hover{background:var(--pink-pastel);color:var(--pink-dark)!important}
+.t-nav-link.active{background:linear-gradient(135deg,var(--fuchsia),var(--pink));color:#fff!important;box-shadow:0 6px 18px rgba(233,79,135,.35)}
+.t-nav-link.active i{color:#fff}
+.t-nav-icon{width:40px;height:40px;border-radius:50%;background:var(--bg-sec);display:inline-flex;align-items:center;justify-content:center;color:var(--pink-dark);font-size:1.05rem;position:relative;border:none;text-decoration:none}
+.t-nav-icon:hover{background:var(--pink-pastel);color:var(--pink-dark)}
+.t-nav-icon .badge{position:absolute;top:-2px;right:-2px;background:var(--fuchsia);color:#fff;border-radius:50%;font-size:.6rem;width:17px;height:17px;display:flex;align-items:center;justify-content:center}
+/* Desktop (>=xl): centrar menú */
+@media(min-width:1200px){
+  .navbar-inner{flex-wrap:nowrap}
+  .t-nav-links{flex:1;display:flex;justify-content:center;margin:0;min-width:0}
+  .t-nav-links .navbar-nav{width:auto;flex-direction:row;align-items:center;flex-wrap:nowrap}
+  .nav-tools{margin-left:16px}
+}
+/* Colapso móvil: menú y tools se apilan de forma limpia */
+@media(max-width:1199.98px){
+  .navbar-inner{flex-wrap:wrap}
+  .t-nav-links{margin-top:10px}
+  .t-nav-links .navbar-nav{flex-direction:column;align-items:stretch;width:100%}
+  .t-nav-links .t-nav-link{justify-content:flex-start}
+  .nav-tools{margin-left:12px}
+}
+@media(max-width:575px){.t-bell{order:2}.t-nav-icon{margin-left:auto}}
+</style>
+
+<main>
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="inicio">
+  <i class="bi bi-flower2 deco-flower f1"></i>
+  <i class="bi bi-flower2 deco-flower f2"></i>
+  <i class="bi bi-sun sparkle s1"></i>
+  <i class="bi bi-gem sparkle s2"></i>
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="fade-up">
+          <span class="hero-eyebrow"><i class="bi bi-flower2"></i> Bienvenida a tu espacio de belleza</span>
+          <p class="hero-script">Bienvenida a</p>
+          <h1>SHALOM<span class="accent">.</span></h1>
+          <p class="hero-welcome">Beauty Salon</p>
+          <p class="hero-text">Realza tu belleza, siéntete increíble. Un espacio pensado para ti, donde el cuidado, la elegancia y el bienestar se encuentran en cada detalle.</p>
+          <div class="hero-buttons">
+            <a class="btn btn-primary-hero" sec:authorize="isAuthenticated()" th:href="@{/appointments/create}">Reservar cita <i class="bi bi-arrow-right"></i></a>
+            <a class="btn btn-primary-hero" sec:authorize="!isAuthenticated()" th:href="@{/login}">Reservar cita <i class="bi bi-arrow-right"></i></a>
+            <a class="btn btn-outline-hero" href="#servicios">Conoce nuestros servicios <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-art fade-in">
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="hero-img-wrap">
+            <img src="/img/atención.jpg" alt="Experiencia de belleza SHALOM">
+          </div>
+          <div class="badge-float badge-top">
+            <i class="bi bi-emoji-heart-eyes"></i>
+            <div><small>Clientas felices</small><strong>+500 reseñas</strong></div>
+          </div>
+          <div class="badge-float badge-bottom">
+            <i class="bi bi-award-fill"></i>
+            <div><small>Espacio premium</small><strong>Belleza & Bienestar</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== BENEFITS ==================== -->
+<section class="benefits">
+  <div class="container">
+    <div class="row g-0">
+      <div class="col-md-6 col-lg-3"><div class="benefit"><div class="benefit-icon"><i class="bi bi-gem"></i></div><div><strong>Productos de alta calidad</strong><span>Trabajamos con las mejores marcas</span></div></div></div>
+      <div class="col-md-6 col-lg-3"><div class="benefit"><div class="benefit-icon"><i class="bi bi-award-fill"></i></div><div><strong>Especialistas certificados</strong><span>Tu confianza es lo más importante</span></div></div></div>
+      <div class="col-md-6 col-lg-3"><div class="benefit"><div class="benefit-icon"><i class="bi bi-shield-heart"></i></div><div><strong>Ambiente seguro y relajante</strong><span>Tu bienestar es nuestra prioridad</span></div></div></div>
+      <div class="col-md-6 col-lg-3"><div class="benefit"><div class="benefit-icon"><i class="bi bi-gift-fill"></i></div><div><strong>Promociones exclusivas</strong><span>Porque te mereces más</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SERVICIOS ==================== -->
+<section class="section" id="servicios">
+  <div class="container">
+    <div class="heading fade-up">
+      <span class="script">Descubre tu lado más bello</span>
+      <h2>Nuestros Servicios</h2>
+      <div class="heading-divider"><i class="bi bi-flower2"></i></div>
+      <p>Descubre todo lo que podemos hacer por tu belleza y bienestar.</p>
+    </div>
+    <div class="row g-4 fade-up">
+      <div class="col-md-6 col-lg-4">
+        <article class="service-card">
+          <div class="service-photo"><img src="/img/uñasacrilicas.jpg" alt="Uñas"></div>
+          <div class="service-icon"><i class="bi bi-hand-index-thumb"></i></div>
+          <div class="service-body">
+            <h3>Uñas</h3>
+            <p>Diseños, manicure y pedicure con acabados que hablan de tu estilo.</p>
+            <a class="service-more" href="#contacto">Ver más <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="service-card">
+          <div class="service-photo"><img src="/img/diseño.jpg" alt="Cabello"></div>
+          <div class="service-icon"><i class="bi bi-scissors"></i></div>
+          <div class="service-body">
+            <h3>Cabello</h3>
+            <p>Cortes, color y tratamientos para una versión renovada de ti.</p>
+            <a class="service-more" href="#contacto">Ver más <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="service-card">
+          <div class="service-photo"><img src="/img/calidad.jpg" alt="Facial"></div>
+          <div class="service-icon"><i class="bi bi-droplet-half"></i></div>
+          <div class="service-body">
+            <h3>Facial</h3>
+            <p>Limpiezas y cuidados para una piel luminosa y saludable.</p>
+            <a class="service-more" href="#contacto">Ver más <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="service-card">
+          <div class="service-photo"><img src="/img/manicure.jpg" alt="Pestañas y cejas"></div>
+          <div class="service-icon"><i class="bi bi-eye-fill"></i></div>
+          <div class="service-body">
+            <h3>Pestañas y Cejas</h3>
+            <p>Realza tu mirada con detalles delicados y personalizados.</p>
+            <a class="service-more" href="#contacto">Ver más <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="service-card">
+          <div class="service-photo"><img src="/img/esmalte.jpg" alt="Maquillaje"></div>
+          <div class="service-icon"><i class="bi bi-brush-fill"></i></div>
+          <div class="service-body">
+            <h3>Maquillaje</h3>
+            <p>Looks especiales para tus momentos más importantes.</p>
+            <a class="service-more" href="#contacto">Ver más <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="service-card">
+          <div class="service-photo"><img src="/img/bañoenacrilico.jpg" alt="Tratamientos"></div>
+          <div class="service-icon"><i class="bi bi-gem"></i></div>
+          <div class="service-body">
+            <h3>Tratamientos</h3>
+            <p>Servicios pensados para cuidar, fortalecer y embellecer.</p>
+            <a class="service-more" href="#contacto">Ver más <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div class="btn-center fade-up">
+      <a class="btn btn-outline-hero" href="#contacto">Ver todos los servicios <i class="bi bi-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PROMOCIONES ==================== -->
+<section class="section promo-section" id="promociones">
+  <i class="bi bi-heart-fill deco-heart h1"></i>
+  <i class="bi bi-heart deco-heart h2"></i>
+  <i class="bi bi-flower2 deco-flower f3"></i>
+  <div class="container">
+    <div class="promotion-panel fade-up">
+      <img class="promo-img" src="/img/manicure.jpg" alt="Paquetes especiales de belleza">
+      <i class="bi bi-ribbon promo-bow"></i>
+      <div class="promotion-copy">
+        <span class="promo-badge"><i class="bi bi-flower2 me-1"></i> Oferta especial</span>
+        <p class="promo-script">Tu momento</p>
+        <h2>ES AHORA</h2>
+        <p class="promo-sub">Regálate paquetes especiales pensados para consentirte y salir brillando. Combina tus servicios favoritos.</p>
+        <a class="btn btn-primary-hero" href="#contacto"><i class="bi bi-gift-fill"></i> Ver promociones <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SOBRE NOSOTROS ==================== -->
+<section class="section about" id="nosotros">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="about-copy fade-up">
+          <span class="script">Conócenos un poco más</span>
+          <h2>Sobre Nosotros</h2>
+          <p>En SHALOM creemos que la belleza también es una forma de cuidarse. Nuestro equipo de especialistas certificados trabaja con productos de alta calidad y atención personalizada para que cada visita sea una experiencia especial, cálida y profesional.</p>
+          <ul class="about-points">
+            <li><i class="bi bi-check-circle-fill"></i> Atención personalizada y exclusiva</li>
+            <li><i class="bi bi-check-circle-fill"></i> Productos de las mejores marcas</li>
+            <li><i class="bi bi-check-circle-fill"></i> Ambiente seguro, higiénico y relajante</li>
+            <li><i class="bi bi-check-circle-fill"></i> Todos los servicios de belleza en un solo lugar</li>
+          </ul>
+          <a class="btn btn-primary-hero" href="#contacto">Agenda tu cita <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="about-img-wrap fade-in">
+          <i class="bi bi-flower2 deco-flower f4"></i>
+          <img src="/img/calidad.jpg" alt="Nuestro salón SHALOM">
+          <div class="about-imglabel">Espacio creado para ti <span>SHALOM · Beauty Salon</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== GALERÍA ==================== -->
+<section class="section" id="galeria">
+  <div class="container">
+    <div class="heading fade-up">
+      <span class="script">Nuestro trabajo</span>
+      <h2>Galería</h2>
+      <div class="heading-divider"><i class="bi bi-flower2"></i></div>
+      <p>Conoce algunos de nuestros resultados y deja que hablen por nosotros.</p>
+    </div>
+    <div class="gallery-grid fade-up">
+      <div class="gallery-item"><img src="/img/uñas1.jpg" alt="Diseño de uñas"><div class="gallery-overlay"><span>Uñas</span></div></div>
+      <div class="gallery-item"><img src="/img/uñas2.jpg" alt="Manicure"><div class="gallery-overlay"><span>Manicure</span></div></div>
+      <div class="gallery-item"><img src="/img/pedicure.jpg" alt="Pedicure"><div class="gallery-overlay"><span>Pedicure</span></div></div>
+      <div class="gallery-item"><img src="/img/diseñoamanoalzada.jpg" alt="Diseño a mano alzada"><div class="gallery-overlay"><span>Diseño</span></div></div>
+      <div class="gallery-item"><img src="/img/uñasacrilicas.jpg" alt="Uñas acrílicas"><div class="gallery-overlay"><span>Acrílicas</span></div></div>
+      <div class="gallery-item"><img src="/img/esmalte.jpg" alt="Esmaltado"><div class="gallery-overlay"><span>Esmaltado</span></div></div>
+    </div>
+    <div class="btn-center fade-up">
+      <a class="btn btn-outline-hero" href="#contacto">Ver galería completa <i class="bi bi-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FIDELIDAD ==================== -->
+<section class="section section-alt" id="fidelidad">
+  <div class="container">
+    <div class="loyalty-section fade-up">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-5">
+          <div class="loyalty-badge"><i class="bi bi-award-fill"></i></div>
+          <span class="script" style="font-family:'Parisienne',cursive;font-size:1.7rem;color:var(--pink)">Tarjeta de fidelidad</span>
+          <h2 class="mt-2 mb-3">Tu belleza tiene beneficios</h2>
+          <p>Acumula <strong>9 sellos</strong> y obtén <strong>1 servicio gratis</strong>. Cada visita te acerca a una nueva recompensa SHALOM.</p>
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-primary-hero" sec:authorize="isAuthenticated()" th:href="@{/mi-tarjeta}"><i class="bi bi-person-vcard"></i> Ver mi tarjeta</a>
+            <a class="btn btn-primary-hero" sec:authorize="!isAuthenticated()" th:href="@{/register}"><i class="bi bi-person-plus"></i> Crear mi cuenta</a>
+            <button class="loyalty-flip-toggle" type="button" id="loyaltyFlipBtn"><i class="bi bi-arrow-repeat"></i> Voltear tarjeta</button>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="loyalty-card-scene" role="group" aria-label="Tarjeta de fidelidad SHALOM. Pasa el cursor para girarla." tabindex="0">
+            <div class="loyalty-card" id="loyaltyCard">
+              <div class="loyalty-card-face loyalty-card-front" role="img" aria-label="Frente de la tarjeta SHALOM"><span>Frente</span></div>
+              <div class="loyalty-card-face loyalty-card-back" role="img" aria-label="Respaldo de la tarjeta SHALOM"><span>Respaldo</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTACTO ==================== -->
+<section class="section contact" id="contacto">
+  <div class="container">
+    <div class="heading fade-up">
+      <span class="script">Estamos para atenderte</span>
+      <h2>Hablemos de tu próxima cita</h2>
+      <div class="heading-divider"><i class="bi bi-flower2"></i></div>
+    </div>
+    <div class="row g-4 fade-up">
+      <div class="col-lg-6">
+        <div class="contact-card">
+          <h3><i class="bi bi-chat-heart text-pink me-2"></i> Déjanos tu mensaje</h3>
+          <form>
+            <input class="form-control mb-3" type="text" placeholder="Nombre">
+            <input class="form-control mb-3" type="email" placeholder="Correo">
+            <input class="form-control mb-3" type="text" placeholder="Teléfono">
+            <textarea class="form-control mb-3" rows="4" placeholder="Mensaje"></textarea>
+            <button type="button" class="btn btn-primary-hero">Enviar mensaje <i class="bi bi-send"></i></button>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="contact-card">
+          <h3><i class="bi bi-geo-alt-fill text-pink me-2"></i> Información de contacto</h3>
+          <div class="contact-item"><div class="ci-icon"><i class="bi bi-geo-alt"></i></div><div><h5>Dirección</h5><p>Agrega aquí la dirección del salón.</p></div></div>
+          <div class="contact-item"><div class="ci-icon"><i class="bi bi-telephone"></i></div><div><h5>Teléfono</h5><p>Agrega aquí el número de WhatsApp.</p></div></div>
+          <div class="contact-item"><div class="ci-icon"><i class="bi bi-envelope"></i></div><div><h5>Correo</h5><p>Agrega aquí el correo del salón.</p></div></div>
+          <div class="contact-item"><div class="ci-icon"><i class="bi bi-clock"></i></div><div><h5>Horario</h5><p>Lunes a sábado · 8:00 a. m. - 7:00 p. m.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+  <i class="bi bi-flower2 deco-flower f6"></i>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <a class="brand" th:href="@{/}"><span class="brand-name">SHALOM</span><span class="brand-sub">Beauty Salon</span></a>
+        <p class="mt-3">Belleza, bienestar y cuidado en un solo lugar. Un espacio premium creado para ti.</p>
+        <div class="mt-3"><a class="social" href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a><a class="social" href="#" aria-label="TikTok"><i class="bi bi-tiktok"></i></a><a class="social" href="#" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a><a class="social" href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a></div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="footer-title">Enlaces</div>
+        <a class="d-block mb-2" href="#inicio"><i class="bi bi-chevron-right me-1"></i>Inicio</a>
+        <a class="d-block mb-2" href="#servicios"><i class="bi bi-chevron-right me-1"></i>Servicios</a>
+        <a class="d-block mb-2" href="#fidelidad"><i class="bi bi-chevron-right me-1"></i>Fidelidad</a>
+        <a class="d-block mb-2" href="#contacto"><i class="bi bi-chevron-right me-1"></i>Contacto</a>
+      </div>
+      <div class="col-6 col-lg-2">
+        <div class="footer-title">Cuenta</div>
+        <a class="d-block mb-2" sec:authorize="!isAuthenticated()" th:href="@{/login}"><i class="bi bi-box-arrow-in-right me-1"></i>Iniciar sesión</a>
+        <a class="d-block mb-2" sec:authorize="!isAuthenticated()" th:href="@{/register}"><i class="bi bi-person-plus me-1"></i>Registrarse</a>
+      </div>
+      <div class="col-lg-3">
+        <div class="footer-title">Síguenos</div>
+        <p>Mantente al día con nuestras novedades y promociones exclusivas.</p>
+      </div>
+    </div>
+    <div class="footer-bottom text-center">
+      <p class="mb-0">© <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2026</span> SHALOM Beauty Salon · Hecho con <i class="bi bi-heart-fill"></i> para ti</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(()=>{
+  // Loyalty card flip
+  const scene=document.querySelector('.loyalty-card-scene'),
+        card=document.querySelector('#loyaltyCard'),
+        btn=document.querySelector('#loyaltyFlipBtn');
+  if(scene&&card&&btn){
+    const flip=()=>{card.classList.toggle('is-flipped')};
+    btn.addEventListener('click',flip);
+    scene.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}});
+  }
+
+  // Fade in on scroll
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});
+  },{threshold:.12});
+  document.querySelectorAll('.fade-up,.fade-in').forEach(el=>io.observe(el));
+})();
+</script>
+</body>
+</html>

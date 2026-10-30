@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer th:fragment="shalomFooter" class="footer">
+    <i class="bi bi-flower2 deco-flower f6"></i>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <a class="brand" th:href="@{/dashboard}"><span class="brand-name">SHALOM</span><span class="brand-sub">Beauty Salon</span></a>
+                <p class="mt-3">Belleza, bienestar y cuidado en un solo lugar. Un espacio premium creado para ti.</p>
+                <div class="mt-3">
+                    <a class="social" href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    <a class="social" href="#" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
+                    <a class="social" href="#" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                    <a class="social" href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="footer-title">Enlaces</div>
+                <a class="d-block mb-2" th:href="@{/dashboard}"><i class="bi bi-chevron-right me-1"></i>Panel</a>
+                <a class="d-block mb-2" th:href="@{/appointments}"><i class="bi bi-chevron-right me-1"></i>Citas</a>
+                <a class="d-block mb-2" th:href="@{/mi-tarjeta}"><i class="bi bi-chevron-right me-1"></i>Fidelidad</a>
+                <a class="d-block mb-2" th:href="@{/services}"><i class="bi bi-chevron-right me-1"></i>Servicios</a>
+            </div>
+            <div class="col-6 col-lg-2">
+                <div class="footer-title">Cuenta</div>
+                <a class="d-block mb-2" th:href="@{/profile}"><i class="bi bi-chevron-right me-1"></i>Mi perfil</a>
+                <a class="d-block mb-2" th:href="@{/specialists}"><i class="bi bi-chevron-right me-1"></i>Especialistas</a>
+            </div>
+            <div class="col-lg-3">
+                <div class="footer-title">Síguenos</div>
+                <p>Mantente al día con nuestras novedades y promociones exclusivas.</p>
+            </div>
+        </div>
+        <div class="footer-bottom text-center">
+            <p class="mb-0">© <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2026</span> SHALOM Beauty Salon · Hecho con <i class="bi bi-heart-fill"></i> para ti</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

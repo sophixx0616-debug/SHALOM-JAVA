@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <title>Reservar cita | SHALOM Beauty Salon</title>
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+            rel="stylesheet">
+
+    <style>
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #fff8fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .page-container {
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .appointment-card {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6f5260;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #8b7780;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #654c59;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 50px;
+            border: 1px solid #eadce2;
+            border-radius: 12px;
+            padding: 10px 14px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #c79aaa;
+            box-shadow: 0 0 0 0.2rem rgba(199, 154, 170, 0.15);
+        }
+
+        .schedule-card {
+            background: #fff4f8;
+            border: 1px solid #f0dce5;
+            border-radius: 16px;
+            padding: 18px;
+            color: #6d5962;
+        }
+
+        .schedule-card strong {
+            color: #654c59;
+        }
+
+        .btn-shalom {
+            background: #8e6c7b;
+            border: none;
+            color: white;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+        }
+
+        .btn-shalom:hover {
+            background: #765665;
+            color: white;
+        }
+
+        .btn-cancel {
+            border: 1px solid #d9c4cc;
+            color: #6d5962;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-cancel:hover {
+            background: #faf1f5;
+            color: #6d5962;
+        }
+
+        .error-message {
+            background: #fff0f0;
+            color: #a33a3a;
+            border: 1px solid #f0caca;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #eefaf1;
+            color: #347346;
+            border: 1px solid #ccebd3;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+
+            .page-container {
+                padding: 20px 14px;
+            }
+
+            .appointment-card {
+                padding: 22px 18px;
+                border-radius: 18px;
+            }
+
+            .page-title {
+                font-size: 26px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .buttons a,
+            .buttons button {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <div class="appointment-card">
+
+        <h1 class="page-title">
+            Reservar cita
+        </h1>
+
+        <p class="page-subtitle">
+            Elige el servicio, la fecha, la hora y tu especialista.
+        </p>
+
+
+        <!-- MENSAJE DE ERROR -->
+
+        <div
+                th:if="${error}"
+                class="error-message">
+
+            <i class="bi bi-exclamation-circle"></i>
+
+            <span th:text="${error}">
+                Ha ocurrido un error.
+            </span>
+
+        </div>
+
+
+        <!-- MENSAJE DE ÉXITO -->
+
+        <div
+                th:if="${success}"
+                class="success-message">
+
+            <i class="bi bi-check-circle"></i>
+
+            <span th:text="${success}">
+                Operación realizada correctamente.
+            </span>
+
+        </div>
+
+
+        <!-- FORMULARIO -->
+
+        <form
+                th:action="@{/appointments}"
+                method="post"
+                id="appointmentForm">
+
+
+            <div class="row g-4">
+
+
+                <!-- SERVICIO -->
+
+                <div class="col-12">
+
+                    <label
+                            for="serviceSel"
+                            class="form-label">
+
+                        Servicio
+
+                    </label>
+
+                    <select
+                            id="serviceSel"
+                            name="service_id"
+                            class="form-select"
+                            required>
+
+                        <option value="">
+                            Selecciona un servicio
+                        </option>
+
+                        <option
+                                th:each="service : ${services}"
+                                th:value="${service.id}"
+                                th:text="${service.name + ' — ' + service.duration + ' minutos'}">
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- FECHA -->
+
+                <div class="col-md-6">
+
+                    <label
+                            for="dateSel"
+                            class="form-label">
+
+                        Fecha
+
+                    </label>
+
+                    <input
+                            id="dateSel"
+                            type="date"
+                            name="date"
+                            class="form-control"
+                            th:attr="min=${today}"
+                            required>
+
+                    <small class="text-muted">
+
+                        No se permiten fechas anteriores.
+
+                    </small>
+
+                </div>
+
+
+                <!-- HORA -->
+
+                <div class="col-md-6">
+
+                    <label
+                            for="timeSel"
+                            class="form-label">
+
+                        Hora
+
+                    </label>
+
+                    <input
+                            id="timeSel"
+                            type="time"
+                            name="time"
+                            class="form-control"
+                            min="08:00"
+                            max="19:00"
+                            step="1800"
+                            required>
+
+                    <small class="text-muted">
+
+                        Horario disponible:
+                        8:00 a. m. — 7:00 p. m.
+
+                    </small>
+
+                </div>
+
+
+                <!-- ESPECIALISTA -->
+
+                <div class="col-12">
+
+                    <label
+                            for="workerSel"
+                            class="form-label">
+
+                        Especialista
+
+                    </label>
+
+                    <select
+                            id="workerSel"
+                            name="worker"
+                            class="form-select">
+
+                        <option value="">
+                            Selecciona una especialista
+                        </option>
+
+                        <option
+                                th:each="specialist : ${specialists}"
+                                th:value="${specialist.name}"
+                                th:text="${specialist.name + ' — ' + specialist.specialty}">
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- HORARIO -->
+
+            <div class="schedule-card mt-4">
+
+                <div class="mb-2">
+
+                    <i class="bi bi-clock"></i>
+
+                    <strong>
+                        Horario de atención
+                    </strong>
+
+                </div>
+
+                <div>
+                    Lunes a sábado:
+                    <strong>
+                        8:00 a. m. — 7:00 p. m.
+                    </strong>
+                </div>
+
+                <div>
+                    Domingo:
+                    <strong>
+                        Cerrado
+                    </strong>
+                </div>
+
+                <small class="d-block mt-2">
+
+                    La duración del servicio se tiene en cuenta
+                    para evitar que una cita termine después
+                    del cierre del salón.
+
+                </small>
+
+            </div>
+
+
+            <!-- BOTONES -->
+
+            <div
+                    class="buttons d-flex flex-wrap gap-3 mt-4">
+
+                <button
+                        type="submit"
+                        class="btn btn-shalom">
+
+                    <i class="bi bi-calendar-check"></i>
+
+                    Reservar cita
+
+                </button>
+
+
+                <a
+                        th:href="@{/appointments}"
+                        class="btn-cancel">
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const dateInput =
+            document.getElementById("dateSel");
+
+        const timeInput =
+            document.getElementById("timeSel");
+
+        const form =
+            document.getElementById("appointmentForm");
+
+
+        if (!dateInput || !timeInput) {
+            return;
+        }
+
+
+        /*
+         * Obtener fecha actual.
+         */
+
+        function getToday() {
+
+            const now = new Date();
+
+            const year =
+                now.getFullYear();
+
+            const month =
+                String(now.getMonth() + 1)
+                    .padStart(2, "0");
+
+            const day =
+                String(now.getDate())
+                    .padStart(2, "0");
+
+            return `${year}-${month}-${day}`;
+        }
+
+
+        const today =
+            getToday();
+
+
+        /*
+         * No permitir fechas anteriores.
+         */
+
+        dateInput.min = today;
+
+
+        /*
+         * Actualizar las horas permitidas.
+         */
+
+        function updateTimeLimits() {
+
+            const selectedDate =
+                dateInput.value;
+
+
+            if (!selectedDate) {
+
+                timeInput.disabled = false;
+
+                timeInput.min = "08:00";
+                timeInput.max = "19:00";
+
+                return;
+            }
+
+
+            /*
+             * Crear fecha sin problemas
+             * de zona horaria.
+             */
+
+            const selected =
+                new Date(
+                    selectedDate + "T00:00:00"
+                );
+
+
+            /*
+             * Domingo = 0.
+             */
+
+            if (selected.getDay() === 0) {
+
+                timeInput.value = "";
+                timeInput.disabled = true;
+
+                alert(
+                    "SHALOM no atiende los domingos."
+                );
+
+                return;
+
+            }
+
+
+            timeInput.disabled = false;
+
+            timeInput.min = "08:00";
+            timeInput.max = "19:00";
+
+
+            /*
+             * Si la fecha es hoy,
+             * impedir horas anteriores.
+             */
+
+            if (selectedDate === today) {
+
+                const now =
+                    new Date();
+
+                let hours =
+                    now.getHours();
+
+                let minutes =
+                    now.getMinutes();
+
+
+                /*
+                 * Redondear a la siguiente
+                 * media hora.
+                 */
+
+                if (minutes === 0) {
+
+                    minutes = 0;
+
+                } else if (minutes <= 30) {
+
+                    minutes = 30;
+
+                } else {
+
+                    hours++;
+                    minutes = 0;
+                }
+
+
+                /*
+                 * Antes de las 8 AM.
+                 */
+
+                if (hours < 8) {
+
+                    hours = 8;
+                    minutes = 0;
+                }
+
+
+                /*
+                 * Después del cierre.
+                 */
+
+                if (hours >= 19) {
+
+                    timeInput.min = "19:00";
+
+                    return;
+                }
+
+
+                const minTime =
+                    String(hours)
+                        .padStart(2, "0")
+                    + ":"
+                    + String(minutes)
+                        .padStart(2, "0");
+
+
+                timeInput.min =
+                    minTime;
+
+            }
+
+        }
+
+
+        dateInput.addEventListener(
+            "change",
+            updateTimeLimits
+        );
+
+
+        updateTimeLimits();
+
+
+        /*
+         * Validación adicional antes
+         * de enviar el formulario.
+         */
+
+        form.addEventListener(
+            "submit",
+            function (event) {
+
+                const selectedDate =
+                    dateInput.value;
+
+                const selectedTime =
+                    timeInput.value;
+
+
+                if (!selectedDate
+                    || !selectedTime) {
+
+                    return;
+                }
+
+
+                /*
+                 * Domingo.
+                 */
+
+                const selected =
+                    new Date(
+                        selectedDate
+                        + "T00:00:00"
+                    );
+
+                if (selected.getDay() === 0) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "No puedes reservar una cita el domingo."
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * Fecha pasada.
+                 */
+
+                if (selectedDate < today) {
+
+                    event.preventDefault();
+
+                    alert(
+                        "No puedes reservar una fecha anterior a hoy."
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * Si es hoy, comprobar hora.
+                 */
+
+                if (selectedDate === today) {
+
+                    const now =
+                        new Date();
+
+                    const currentMinutes =
+                        now.getHours() * 60
+                        + now.getMinutes();
+
+
+                    const parts =
+                        selectedTime.split(":");
+
+                    const selectedMinutes =
+                        parseInt(parts[0]) * 60
+                        + parseInt(parts[1]);
+
+
+                    if (selectedMinutes
+                        <= currentMinutes) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "No puedes reservar una hora que ya pasó."
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>
